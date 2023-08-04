@@ -1,0 +1,54 @@
+%%%%%%%%%%%%%%%%%%%%%%     开始前的准备    %%%%%%%%%%%%%%%%%%%
+close all;%关闭所有图形窗口
+clearvars;%清除工作区
+sca;%清除屏幕
+HideCursor;%隐藏光标
+
+%%%%%%%%%%%%%%%%%%%%%%     窗口设置    %%%%%%%%%%%%%%%%%%%%%%
+Screen('Preference', 'SkipSyncTests', 0);%禁止跳过自检保证时序精度
+wptr = Screen('OpenWindow',0,127.5);%打开一个窗口进行控制，默认全屏
+Priority(MaxPriority(wptr));%设置优先级
+numFrames = 3;%numFrames为显示每个色块需要的帧数
+ifi = Screen('GetFlipInterval', wptr);%此值根据显示器频率而定
+
+%%%%%%%%%%%%%%%%%%%%     5通道测量实验    %%%%%%%%%%%%%%%%%%%%%
+psition1 = [52,49,53,50];%第1点位
+psition2 = [1871,50,1872,51];%第2点位
+psition3 =[962,540,963,541];%第3点位
+psition4 =[52,1029,53,1030];%第4点位
+psition5 =[1872,1029,1873,1030];%第5点位
+
+a = zeros(1,1);%创建零矩阵,1像素大小
+b = zeros(1,1);%创建零矩阵,1像素大小
+b(:,:) = 255;%把b矩阵全部赋值 255
+e(1) = Screen('MakeTexture',wptr,a);%把a矩阵值写入显存，矩阵句柄为e(1)，黑色
+e(2) = Screen('MakeTexture',wptr,b);%把b矩阵值写入显存，矩阵句柄为e(2)，白色
+Screen('DrawTexture',wptr,e(2),[],psition1);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。  
+Screen('DrawTexture',wptr,e(2),[],psition2);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+Screen('DrawTexture',wptr,e(2),[],psition3);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+Screen('DrawTexture',wptr,e(2),[],psition4);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+Screen('DrawTexture',wptr,e(2),[],psition5);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+VBL = Screen('Flip', wptr);%将图像显示在显示器上，获取上一帧的结束时间用于后面精确切换时间的计算
+
+for j = 1 : 2000
+    Screen('DrawTexture',wptr,e(1),[],psition1);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+    Screen('DrawTexture',wptr,e(1),[],psition2);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+    Screen('DrawTexture',wptr,e(1),[],psition3);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+    Screen('DrawTexture',wptr,e(1),[],psition4);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+    Screen('DrawTexture',wptr,e(1),[],psition5);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+    Screen('DrawingFinished', wptr);%阻止其它绘制，保证更好的时间精确度
+    [vbl,sti,flt] = Screen('Flip', wptr, VBL + (numFrames-0.5)* ifi ); %将图像显示在显示器上
+    
+    Screen('DrawTexture',wptr,e(2),[],psition1);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+    Screen('DrawTexture',wptr,e(2),[],psition2);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+    Screen('DrawTexture',wptr,e(2),[],psition3);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+    Screen('DrawTexture',wptr,e(2),[],psition4);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+    Screen('DrawTexture',wptr,e(2),[],psition5);%把放入显存中的Texture写入帧缓存，也就是写入绘图区域。
+    Screen('DrawingFinished', wptr);%阻止其它绘制，保证更好的时间精确度
+    [VBL,STI,FLT] = Screen('Flip', wptr, vbl + (numFrames-0.5)* ifi); %将图像显示在显示器上
+end
+%%%%%%%%%%%%%%%%%%%%%%     关闭串口    %%%%%%%%%%%%%%%
+pause(1);
+sca;%清除屏幕
+close all;%关闭所有图形窗口
+clearvars;%清除工作区
